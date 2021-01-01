@@ -5,39 +5,61 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.PointF
 import android.util.Log
-import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintSet
 
 @SuppressLint("ViewConstructor")
-class Model(context: Context, var quantity: Int, var canvas: Canvas):ViewGroup(context){
-    val nodes = mutableListOf<Node>()
+class Model(context: Context, quantity: Int):ViewGroup(context){
+    var nodes = mutableListOf<Node>()
     val lines = mutableListOf<Line>()
-//    lateinit var node: Node
     init {
         for (i in 0 until quantity){
             nodes.add(
-            Node(PointF((0..context.resources.displayMetrics.widthPixels).random().toFloat(), (0..context.resources.displayMetrics.heightPixels).random().toFloat()),
-                    context.resources.displayMetrics.widthPixels / 40.toFloat(),
+                    Node(
+                            PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
+                            1000 / 40.toFloat(),
                             this.context,
-                            TestData.list[i])
+                            if (i != quantity -1) mutableListOf(i+1) else mutableListOf()
+                    )
             )
-//            Log.d("Test", node.data.toString())
-//            node.setOnClickListener {
-//                Log.d("Test", it.toString())
-//            }
-//            nodes.add(node)
         }
-
-        for (i in 0 until quantity-1){
-            lines.add(
-                Line(
-                    nodes[i],
-                    nodes[i + 1],
-                    this.context
+        nodes.add(
+                Node(
+                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
+                        1000 / 40.toFloat(),
+                        this.context,
+                        mutableListOf()
                 )
-            )
+        )
+
+        nodes.add(
+                Node(
+                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
+                        1000 / 40.toFloat(),
+                        this.context,
+                        mutableListOf()
+                )
+        )
+
+        nodes.add(
+                Node(
+                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
+                        1000 / 40.toFloat(),
+                        this.context,
+                        mutableListOf()
+                )
+        )
+        nodes[1].childNodeID.addAll(mutableListOf(4, 5))
+        nodes[2].childNodeID.add(6)
+        for (i in 0 until nodes.size-1){
+            nodes[i].childNodeID.forEach {
+                lines.add(
+                        Line(
+                                nodes[i],
+                                nodes[it],
+                                this.context
+                        )
+                )
+            }
         }
         nodes.forEach {
             this.addView(it)
@@ -47,14 +69,29 @@ class Model(context: Context, var quantity: Int, var canvas: Canvas):ViewGroup(c
             this.addView(it)
         }
         Log.d("Test", nodes.size.toString() + "\n" + lines.size.toString())
-//        this.setOnClickListener{
-//            onClick(it)
-//        }
-//        nodes.forEach{
-//            it.setOnClickListener {
-//                Log.d("Test", it.toString())
-//            }
-//        }
+    }
+    fun setNodesAndLines(mutableList: MutableList<Node>){
+        nodes = mutableList
+        lines.clear()
+        this.removeAllViews()
+        for (i in 0 until nodes.size-1){
+            nodes[i].childNodeID.forEach {
+                lines.add(
+                        Line(
+                                nodes[i],
+                                nodes[it],
+                                this.context
+                        )
+                )
+            }
+        }
+        nodes.forEach {
+            addView(it)
+        }
+
+        lines.forEach {
+            addView(it)
+        }
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -65,9 +102,4 @@ class Model(context: Context, var quantity: Int, var canvas: Canvas):ViewGroup(c
         }
     }
 
-    fun isContains(point: PointF, node: Node): Boolean {
-        val dx = point.x - node.x
-        val dy = point.y - node.y
-        return dx*dx+dy*dy <= node.radius*node.radius
-    }
 }

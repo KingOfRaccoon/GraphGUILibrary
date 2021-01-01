@@ -9,14 +9,15 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 
-open class Node(var center: PointF, var radius: Float, context: Context):View(context), View.OnClickListener {
+open class Node(var center: PointF, var radius: Float, context: Context, var childNodeID: MutableList<Int>):View(context), View.OnClickListener {
     var data :Any? = null
     constructor(
             center: PointF,
             radius: Float,
             context: Context,
+            childNodeID: MutableList<Int>,
             data : Any
-    ): this(center, radius, context){
+    ): this(center, radius, context, childNodeID){
         this.data = data
         this.setOnClickListener {
             Log.d("Test", toString())

@@ -5,15 +5,16 @@ import android.graphics.PointF
 import android.util.Log
 import android.view.ViewGroup
 import com.example.graphguilibrary.Line
+import com.example.graphguilibrary.Node
 
 class TestModel(context: Context, quantity: Int): ViewGroup(context){
-    var nodes = mutableListOf<TestNode>()
+    var nodes = mutableListOf<Node>()
     val lines = mutableListOf<Line>()
     //    lateinit var node: Node
     init {
         for (i in 0 until quantity){
             nodes.add(
-                TestNode(
+                Node(
                     PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                     1000 / 40.toFloat(),
                     this.context,
@@ -22,7 +23,7 @@ class TestModel(context: Context, quantity: Int): ViewGroup(context){
             )
         }
         nodes.add(
-                TestNode(
+                Node(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         1000 / 40.toFloat(),
                         this.context,
@@ -31,7 +32,7 @@ class TestModel(context: Context, quantity: Int): ViewGroup(context){
         )
 
         nodes.add(
-                TestNode(
+                Node(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         1000 / 40.toFloat(),
                         this.context,
@@ -40,7 +41,7 @@ class TestModel(context: Context, quantity: Int): ViewGroup(context){
         )
 
         nodes.add(
-                TestNode(
+                Node(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         1000 / 40.toFloat(),
                         this.context,
@@ -69,7 +70,7 @@ class TestModel(context: Context, quantity: Int): ViewGroup(context){
         }
         Log.d("Test", nodes.size.toString() + "\n" + lines.size.toString())
     }
-    fun setNodesAndLines(mutableList: MutableList<TestNode>){
+    fun setNodesAndLines(mutableList: MutableList<Node>){
         nodes = mutableList
         lines.clear()
         this.removeAllViews()
