@@ -7,8 +7,8 @@ class TestNiceCreatorGraph(var testModel: TestModel) {
         mutableListNodes.forEachIndexed { index, testNode ->
             if (index == 0)
                 testNode.center = PointF(width / (2 * (index + 1)), testNode.radius + (height / mutableListNodes.size) * index)
-            testNode.сhildNodeID.forEachIndexed { i, it ->
-                mutableListNodes[it].center = PointF(((testNode.center.x / (testNode.сhildNodeID.size)) * (i+1)), (height / mutableListNodes.size) * (index + 1))
+            testNode.childNodeID.forEachIndexed { i, it ->
+                mutableListNodes[it].center = PointF(((testNode.center.x*2 / (testNode.childNodeID.size+1)) * (i+1)), (height / mutableListNodes.size) * (index + 1))
             }
         }
         testModel.setNodesAndLines(mutableListNodes)

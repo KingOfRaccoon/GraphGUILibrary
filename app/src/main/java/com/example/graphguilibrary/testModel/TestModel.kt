@@ -4,11 +4,7 @@ import android.content.Context
 import android.graphics.PointF
 import android.util.Log
 import android.view.ViewGroup
-import androidx.core.view.children
-import androidx.core.view.size
 import com.example.graphguilibrary.Line
-import com.example.graphguilibrary.Node
-import com.example.graphguilibrary.TestData
 
 class TestModel(context: Context, quantity: Int): ViewGroup(context){
     var nodes = mutableListOf<TestNode>()
@@ -33,9 +29,28 @@ class TestModel(context: Context, quantity: Int): ViewGroup(context){
                         mutableListOf()
                 )
         )
-        nodes[1].сhildNodeID.add(4)
+
+        nodes.add(
+                TestNode(
+                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
+                        1000 / 40.toFloat(),
+                        this.context,
+                        mutableListOf()
+                )
+        )
+
+        nodes.add(
+                TestNode(
+                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
+                        1000 / 40.toFloat(),
+                        this.context,
+                        mutableListOf()
+                )
+        )
+        nodes[1].childNodeID.addAll(mutableListOf(4, 5))
+        nodes[2].childNodeID.add(6)
         for (i in 0 until nodes.size-1){
-            nodes[i].сhildNodeID.forEach {
+            nodes[i].childNodeID.forEach {
                 lines.add(
                     Line(
                         nodes[i],
@@ -59,7 +74,7 @@ class TestModel(context: Context, quantity: Int): ViewGroup(context){
         lines.clear()
         this.removeAllViews()
         for (i in 0 until nodes.size-1){
-            nodes[i].сhildNodeID.forEach {
+            nodes[i].childNodeID.forEach {
                 lines.add(
                         Line(
                                 nodes[i],
@@ -85,4 +100,5 @@ class TestModel(context: Context, quantity: Int): ViewGroup(context){
             view.layout(l, t, r, b)
         }
     }
+
 }
