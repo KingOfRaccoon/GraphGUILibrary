@@ -6,7 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.view.View
 
-class Line(var firstNode: Node, var secondNode: Node, context: Context):View(context) {
+class Line(var firstNode: NodeView, var secondNode: NodeView, context: Context):View(context) {
     public override fun onDraw(canvas: Canvas){
         canvas.drawLine(firstNode.center.x, firstNode.center.y,
             secondNode.center.x, secondNode.center.y, Paint(Color.CYAN))

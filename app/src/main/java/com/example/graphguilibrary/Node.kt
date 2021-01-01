@@ -9,27 +9,14 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 
-open class Node(var center: PointF, var radius: Float, context: Context, var childNodeID: MutableList<Int>):View(context), View.OnClickListener {
+open class Node(var childNodeID: MutableList<Int>){
     var data :Any? = null
     constructor(
-            center: PointF,
-            radius: Float,
-            context: Context,
             childNodeID: MutableList<Int>,
             data : Any
-    ): this(center, radius, context, childNodeID){
+    ): this(childNodeID){
         this.data = data
-        this.setOnClickListener {
-            Log.d("Test", toString())
-        }
     }
-    public override fun onDraw(canvas: Canvas){
-        canvas.drawCircle(center.x, center.y, radius, Paint(Color.CYAN))
-    }
-    override fun onClick(v: View?) {
-        Log.d("Test", TestData.list[0].toString())
-    }
-
 
     override fun toString(): String {
         if (data == null)

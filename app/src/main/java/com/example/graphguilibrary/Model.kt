@@ -6,52 +6,53 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import android.util.Log
 import android.view.ViewGroup
+//import com.example.graphguilibrary.testModel.RedNode
 
 @SuppressLint("ViewConstructor")
 class Model(context: Context, quantity: Int):ViewGroup(context){
-    var nodes = mutableListOf<Node>()
+    var nodes = mutableListOf<NodeView>()
     val lines = mutableListOf<Line>()
     init {
         for (i in 0 until quantity){
             nodes.add(
-                    Node(
+                    NodeView(
                             PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                             1000 / 40.toFloat(),
                             this.context,
-                            if (i != quantity -1) mutableListOf(i+1) else mutableListOf()
+                            Node(if (i != quantity -1) mutableListOf(i+1) else mutableListOf(), "qwerty")
                     )
             )
         }
         nodes.add(
-                Node(
+                NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         1000 / 40.toFloat(),
                         this.context,
-                        mutableListOf()
+                        Node(mutableListOf())
                 )
         )
 
         nodes.add(
-                Node(
+                NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         1000 / 40.toFloat(),
                         this.context,
-                        mutableListOf()
+                        Node(mutableListOf())
                 )
         )
 
         nodes.add(
-                Node(
+                NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         1000 / 40.toFloat(),
                         this.context,
-                        mutableListOf()
+                        Node(mutableListOf())
                 )
         )
-        nodes[1].childNodeID.addAll(mutableListOf(4, 5))
-        nodes[2].childNodeID.add(6)
+        nodes[1].node.childNodeID.addAll(mutableListOf(4, 5))
+        nodes[2].node.childNodeID.add(6)
         for (i in 0 until nodes.size-1){
-            nodes[i].childNodeID.forEach {
+            nodes[i].node.childNodeID.forEach {
                 lines.add(
                         Line(
                                 nodes[i],
@@ -70,12 +71,12 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
         }
         Log.d("Test", nodes.size.toString() + "\n" + lines.size.toString())
     }
-    fun setNodesAndLines(mutableList: MutableList<Node>){
+    fun setNodesAndLines(mutableList: MutableList<NodeView>){
         nodes = mutableList
         lines.clear()
         this.removeAllViews()
         for (i in 0 until nodes.size-1){
-            nodes[i].childNodeID.forEach {
+            nodes[i].node.childNodeID.forEach {
                 lines.add(
                         Line(
                                 nodes[i],
@@ -86,6 +87,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
             }
         }
         nodes.forEach {
+            Log.d("Test", "Цвет: " + it.solidColor.toString())
             addView(it)
         }
 
