@@ -1,32 +1,28 @@
 package com.example.graphguilibrary
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.PointF
-import android.util.Log
 import android.view.ViewGroup
-//import com.example.graphguilibrary.testModel.RedNode
 
-@SuppressLint("ViewConstructor")
 class Model(context: Context, quantity: Int):ViewGroup(context){
     var nodes = mutableListOf<NodeView>()
     val lines = mutableListOf<Line>()
+
     init {
         for (i in 0 until quantity){
             nodes.add(
                     NodeView(
                             PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                            1000 / 40.toFloat(),
+                            context.display!!.width / 20.toFloat(),
                             this.context,
-                            Node(if (i != quantity -1) mutableListOf(i+1) else mutableListOf(), "qwerty")
+                            Node(if (i != quantity - 1) mutableListOf(i + 1) else mutableListOf(), "qwerty")
                     )
             )
         }
         nodes.add(
                 NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        1000 / 40.toFloat(),
+                        context.display!!.width / 20.toFloat(),
                         this.context,
                         Node(mutableListOf())
                 )
@@ -35,7 +31,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
         nodes.add(
                 NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        1000 / 40.toFloat(),
+                        context.display!!.width / 20.toFloat(),
                         this.context,
                         Node(mutableListOf())
                 )
@@ -44,7 +40,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
         nodes.add(
                 NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        1000 / 40.toFloat(),
+                        context.display!!.width / 20.toFloat(),
                         this.context,
                         Node(mutableListOf())
                 )
@@ -63,13 +59,12 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
             }
         }
         nodes.forEach {
-            this.addView(it)
+            this.addView(it, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
         }
 
         lines.forEach {
             this.addView(it)
         }
-        Log.d("Test", nodes.size.toString() + "\n" + lines.size.toString())
     }
     fun setNodesAndLines(mutableList: MutableList<NodeView>){
         nodes = mutableList
@@ -87,8 +82,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
             }
         }
         nodes.forEach {
-            Log.d("Test", "Цвет: " + it.solidColor.toString())
-            addView(it)
+            addView(it,LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
         }
 
         lines.forEach {
@@ -98,10 +92,19 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val count = childCount
-        for (i in 0 until count){
-            val view = getChildAt(i)
-            view.layout(l, t, r, b)
+        for (index in 0 until count){
+            val view = getChildAt(index)
+            if (view is NodeView){
+                if (index == 0)
+                    view.center = PointF((width / (2 * (index + 1))).toFloat(), view.radius + (height / nodes.size) * index)
+                view.node.childNodeID.forEachIndexed { i, it ->
+                    nodes[it].center = PointF(((view.center.x * 2 / (view.node.childNodeID.size + 1)) * (i + 1)), ((height / nodes.size) * (index + 1)).toFloat())
+                }
+                view.layout((view.center.x-view.radius).toInt(), (view.center.y - view.radius).toInt(), (view.center.x+view.radius).toInt(), (view.center.y + view.radius).toInt())
+                view.invalidate()
+            }
+            else
+                view.layout(l, t, r, b)
         }
     }
-
 }

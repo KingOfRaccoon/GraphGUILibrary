@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.PointF
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val model = Model(this, 4)
         addContentView(model, ViewGroup.LayoutParams(resources.displayMetrics.widthPixels, resources.displayMetrics.heightPixels))
-        val testNiceCreatorGraph = TestNiceCreatorGraph(model)
-        testNiceCreatorGraph.createNiceGraph(model.nodes, resources.displayMetrics.widthPixels.toFloat(), resources.displayMetrics.heightPixels.toFloat())
+//        val testNiceCreatorGraph = TestNiceCreatorGraph(model)
+//        testNiceCreatorGraph.createNiceGraph(model.nodes, resources.displayMetrics.widthPixels.toFloat(), resources.displayMetrics.heightPixels.toFloat())
     }
 }
