@@ -3,8 +3,14 @@ package com.example.graphguilibrary
 import android.content.Context
 import android.graphics.PointF
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 
-class Model(context: Context, quantity: Int):ViewGroup(context){
+// класс для отрисовки графа
+class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(context){
+    val nodesMediatorLiveData = MediatorLiveData<NodeView>()
     var nodes = mutableListOf<NodeView>()
     val lines = mutableListOf<Line>()
 
@@ -15,7 +21,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
                             PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                             context.display!!.width / 20.toFloat(),
                             this.context,
-                            Node(if (i != quantity - 1) mutableListOf(i + 1) else mutableListOf(), "qwerty")
+                            Node(if (i != quantity - 1) mutableListOf(i + 1) else mutableListOf(), "qwerty"), activity
                     )
             )
         }
@@ -24,7 +30,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         context.display!!.width / 20.toFloat(),
                         this.context,
-                        Node(mutableListOf())
+                        Node(mutableListOf()), activity
                 )
         )
 
@@ -33,7 +39,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         context.display!!.width / 20.toFloat(),
                         this.context,
-                        Node(mutableListOf())
+                        Node(mutableListOf()), activity
                 )
         )
 
@@ -42,7 +48,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
                         context.display!!.width / 20.toFloat(),
                         this.context,
-                        Node(mutableListOf())
+                        Node(mutableListOf()), activity
                 )
         )
         nodes[1].node.childNodeID.addAll(mutableListOf(4, 5))
@@ -58,6 +64,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
                 )
             }
         }
+
         nodes.forEach {
             this.addView(it, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
         }
@@ -65,8 +72,27 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
         lines.forEach {
             this.addView(it)
         }
+        nodes.forEach {
+            nodesMediatorLiveData.addSource(MutableLiveData<NodeView>().apply { value = it }) {
+                addNodeView(it, nodes[it.node.childNodeID.last()])
+            }
+        }
     }
-    fun setNodesAndLines(mutableList: MutableList<NodeView>){
+    fun addNodeView(parentNodeView: NodeView, nodeView: NodeView){ // функция для добавления узла
+        nodes.add(nodeView)
+//        addView(nodeView)
+        parentNodeView.node.childNodeID.add(nodes.size-1)
+//        if (parentNodeView.node.childNodeID.isEmpty())
+
+//        else {
+//            parentNodeView.node.childNodeID.forEachIndexed { i, it ->
+//                nodes[it].center = PointF(((parentNodeView.center.x * 2 / (parentNodeView.node.childNodeID.size + 1)) * (i + 1)), (height / nodes.size) * (getListPosition(nodes, parentNodeView) + 1f))
+//            }
+//        }
+        setNodesAndLines(nodes)
+    }
+
+    fun setNodesAndLines(mutableList: MutableList<NodeView>){ // функция для переотрисовки
         nodes = mutableList
         lines.clear()
         this.removeAllViews()
@@ -81,6 +107,13 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
                 )
             }
         }
+        nodes.forEachIndexed { index, node ->
+            if (index == 0)
+                node.center = PointF((context.display!!.width / (2 * (index + 1))).toFloat(), node.radius + (height / nodes.size) * index)
+            node.node.childNodeID.forEachIndexed { i, it ->
+                nodes[it].center = PointF(((node.center.x*2 / (node.node.childNodeID.size+1)) * (i+1)), ((height / nodes.size) * (index + 1)).toFloat())
+            }
+        }
         nodes.forEach {
             addView(it,LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
         }
@@ -90,7 +123,7 @@ class Model(context: Context, quantity: Int):ViewGroup(context){
         }
     }
 
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) { // размещение на фрагменте детей
         val count = childCount
         for (index in 0 until count){
             val view = getChildAt(index)
