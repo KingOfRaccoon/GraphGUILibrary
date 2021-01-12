@@ -2,24 +2,30 @@ package com.example.graphguilibrary
 
 import android.content.Context
 import android.graphics.PointF
+import android.os.Build
+import android.util.Log
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import java.lang.Integer.min
 
 // класс для отрисовки графа
+@RequiresApi(Build.VERSION_CODES.N)
 class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(context){
     val nodesMediatorLiveData = MediatorLiveData<NodeView>()
     var nodes = mutableListOf<NodeView>()
     val lines = mutableListOf<Line>()
 
     init {
+
         for (i in 0 until quantity){
             nodes.add(
                     NodeView(
                             PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                            context.display!!.width / 20.toFloat(),
+                            min(context.display!!.width, context.display!!.height) / 20.toFloat(),
                             this.context,
                             Node(if (i != quantity - 1) mutableListOf(i + 1) else mutableListOf(), "qwerty"), activity
                     )
@@ -28,7 +34,7 @@ class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(c
         nodes.add(
                 NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        context.display!!.width / 20.toFloat(),
+                        min(context.display!!.width, context.display!!.height) / 20.toFloat(),
                         this.context,
                         Node(mutableListOf()), activity
                 )
@@ -37,7 +43,7 @@ class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(c
         nodes.add(
                 NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        context.display!!.width / 20.toFloat(),
+                        min(context.display!!.width, context.display!!.height)/ 20.toFloat(),
                         this.context,
                         Node(mutableListOf()), activity
                 )
@@ -46,7 +52,7 @@ class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(c
         nodes.add(
                 NodeView(
                         PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        context.display!!.width / 20.toFloat(),
+                        min(context.display!!.width, context.display!!.height)/ 20.toFloat(),
                         this.context,
                         Node(mutableListOf()), activity
                 )
@@ -80,15 +86,7 @@ class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(c
     }
     fun addNodeView(parentNodeView: NodeView, nodeView: NodeView){ // функция для добавления узла
         nodes.add(nodeView)
-//        addView(nodeView)
         parentNodeView.node.childNodeID.add(nodes.size-1)
-//        if (parentNodeView.node.childNodeID.isEmpty())
-
-//        else {
-//            parentNodeView.node.childNodeID.forEachIndexed { i, it ->
-//                nodes[it].center = PointF(((parentNodeView.center.x * 2 / (parentNodeView.node.childNodeID.size + 1)) * (i + 1)), (height / nodes.size) * (getListPosition(nodes, parentNodeView) + 1f))
-//            }
-//        }
         setNodesAndLines(nodes)
     }
 
@@ -129,9 +127,9 @@ class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(c
             val view = getChildAt(index)
             if (view is NodeView){
                 if (index == 0)
-                    view.center = PointF((width / (2 * (index + 1))).toFloat(), view.radius + (height / nodes.size) * index)
+                    view.center = PointF((width / (2 * (index + 1))).toFloat(), view.radius + (height / calculateLevels()) * index)
                 view.node.childNodeID.forEachIndexed { i, it ->
-                    nodes[it].center = PointF(((view.center.x * 2 / (view.node.childNodeID.size + 1)) * (i + 1)), ((height / nodes.size) * (index + 1)).toFloat())
+                    nodes[it].center = PointF(((view.center.x * 2 / (view.node.childNodeID.size + 1)) * (i + 1)), ((height / calculateLevels()) * (if (index == 0) 1 else getLevelNodeView(view))).toFloat())
                 }
                 view.layout((view.center.x-view.radius).toInt(), (view.center.y - view.radius).toInt(), (view.center.x+view.radius).toInt(), (view.center.y + view.radius).toInt())
                 view.invalidate()
@@ -139,5 +137,51 @@ class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(c
             else
                 view.layout(l, t, r, b)
         }
+        Log.d("Test", getLevelNodeView(nodes[2]).toString())
+    }
+
+    private fun calculateLevels(count: Int = 2):Int{
+        var counter = count
+        nodes.forEachIndexed { index, nodeView ->
+            if (getNodesWithChild(nodeView.node.childNodeID).isNotEmpty())
+                counter++
+        }
+        return counter
+    }
+
+    private fun getNodesWithChild(mutableList: MutableList<Int>):MutableList<NodeView>{
+        val mutableListNodeViews = mutableListOf<NodeView>()
+        mutableList.forEach {
+            val nodeView = nodes[it]
+            if (nodeView.node.childNodeID.isNotEmpty())
+                mutableListNodeViews.add(nodeView)
+        }
+        return mutableListNodeViews
+    }
+
+    private fun getLevelNodeView(nodeView: NodeView): Int {
+        var level = 1
+        var view = searchParent(nodeView)
+        while (view != nodes.first()){
+            view = searchParent(view)
+            level++
+        }
+        level++
+        return level
+    }
+
+    private fun getPosition(nodeView: NodeView): Int {
+        var position = 0
+        for (i in nodes.indices){
+            if (nodeView == nodes[i]){
+                position = i
+                break
+            }
+        }
+        return position
+    }
+
+    private fun searchParent(nodeView: NodeView): NodeView{
+        return nodes.find { it.node.childNodeID.contains(getPosition(nodeView)) }!!
     }
 }
