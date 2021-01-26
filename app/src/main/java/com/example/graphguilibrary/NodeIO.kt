@@ -8,5 +8,4 @@ interface NodeIO {
     fun writeNode(node: Node)
 
     fun writeNodes(nodes: List<Node>)
-
 }
