@@ -12,7 +12,7 @@ import android.view.MotionEvent
 import androidx.annotation.RequiresApi
 
 // класс для отображения узла
-class NodeView(var center: PointF, var radius: Float, context: Context, var node: Node, activity: MainActivity)
+class NodeView(var center: PointF, var radius: Float, context: Context, var node: Node)
     : androidx.appcompat.widget.AppCompatButton(context){
 
     val gestureDetector = GestureDetector(context, object : SimpleOnGestureListener() {
@@ -20,7 +20,7 @@ class NodeView(var center: PointF, var radius: Float, context: Context, var node
         @RequiresApi(Build.VERSION_CODES.N)
         override fun onLongPress(e: MotionEvent) { // длинный ТЫК
             Log.e("Test", "Longpress detected")
-            CustomAlertDialog().createAlertDialog(activity, this@NodeView)!!.create().show()
+            CustomAlertDialog().createAlertDialog(this@NodeView)!!.create().show()
         }
 
         override fun onSingleTapUp(e: MotionEvent): Boolean { // одиночный ТЫК

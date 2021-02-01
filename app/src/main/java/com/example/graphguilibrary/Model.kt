@@ -3,8 +3,10 @@ package com.example.graphguilibrary
 import android.content.Context
 import android.graphics.PointF
 import android.os.Build
+import android.util.AttributeSet
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -13,76 +15,41 @@ import androidx.lifecycle.Observer
 import java.lang.Integer.min
 
 // класс для отрисовки графа
-@RequiresApi(Build.VERSION_CODES.N)
-class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(context){
-    val nodesMediatorLiveData = MediatorLiveData<NodeView>()
+class Model(context: Context):ViewGroup(context){
+    var quantity = 1
     var nodes = mutableListOf<NodeView>()
     val lines = mutableListOf<Line>()
-
+    val radius = Math.min(context.display!!.width, context.display!!.height) / 20.toFloat()
+    constructor(context: Context, attributeSet: AttributeSet): this(context){
+        val typedArray = context.obtainStyledAttributes(attributeSet, R.styleable.Model,0, 0)
+        try {
+            quantity = typedArray.getInt(R.styleable.Model_quantity, 1)
+            update()
+            Log.e("Test", quantity.toString())
+        }catch (e: Exception){
+            Log.e("Test", e.message.toString())
+        }finally {
+            typedArray.recycle()
+        }
+    }
     init {
-
+        update()
+    }
+    fun update(){
+        this.removeAllViews()
+        nodes.clear()
+        lines.clear()
         for (i in 0 until quantity){
             nodes.add(
                     NodeView(
                             PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                            min(context.display!!.width, context.display!!.height) / 20.toFloat(),
+                            radius,
                             this.context,
-                            Node(if (i != quantity - 1) mutableListOf(i + 1) else mutableListOf(), "qwerty"), activity
+                            Node(if (i != quantity - 1) mutableListOf(i + 1) else mutableListOf(), "qwerty")
                     )
             )
         }
-        nodes.add(
-                NodeView(
-                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        min(context.display!!.width, context.display!!.height) / 20.toFloat(),
-                        this.context,
-                        Node(mutableListOf()), activity
-                )
-        )
-
-        nodes.add(
-                NodeView(
-                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        min(context.display!!.width, context.display!!.height)/ 20.toFloat(),
-                        this.context,
-                        Node(mutableListOf()), activity
-                )
-        )
-
-        nodes.add(
-                NodeView(
-                        PointF((0..1000).random().toFloat(), (0..1000).random().toFloat()),
-                        min(context.display!!.width, context.display!!.height)/ 20.toFloat(),
-                        this.context,
-                        Node(mutableListOf()), activity
-                )
-        )
-        nodes[1].node.childNodeID.addAll(mutableListOf(4, 5))
-        nodes[2].node.childNodeID.add(6)
-        for (i in 0 until nodes.size-1){
-            nodes[i].node.childNodeID.forEach {
-                lines.add(
-                        Line(
-                                nodes[i],
-                                nodes[it],
-                                this.context
-                        )
-                )
-            }
-        }
-
-        nodes.forEach {
-            this.addView(it, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
-        }
-
-        lines.forEach {
-            this.addView(it)
-        }
-        nodes.forEach {
-            nodesMediatorLiveData.addSource(MutableLiveData<NodeView>().apply { value = it }) {
-                addNodeView(it, nodes[it.node.childNodeID.last()])
-            }
-        }
+        setNodesAndLines(nodes)
     }
     fun addNodeView(parentNodeView: NodeView, nodeView: NodeView){ // функция для добавления узла
         nodes.add(nodeView)
@@ -137,7 +104,6 @@ class Model(context: Context, quantity: Int, activity: MainActivity):ViewGroup(c
             else
                 view.layout(l, t, r, b)
         }
-        Log.d("Test", getLevelNodeView(nodes[2]).toString())
     }
 
     private fun calculateLevels(count: Int = 2):Int{

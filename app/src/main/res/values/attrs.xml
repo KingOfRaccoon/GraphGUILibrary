@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    <declare-styleable name="Draw2D">-->
-<!--        <attr name="quantity" format="integer"/>-->
-<!--    </declare-styleable>-->
-
     <declare-styleable name="Model">
         <attr name="quantity" format="integer"/>
     </declare-styleable>
